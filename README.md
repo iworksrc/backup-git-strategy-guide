@@ -3,6 +3,8 @@
 
 ![общая картина](./pics/gs.png)
 
+## Порядок работы
+
 
 ## Ветви
 
@@ -35,7 +37,7 @@
 
 При начале работы над новой функциональностью делается ответвление от ветви разработки (develop).
 
-```bash
+```git
 $ git checkout -b myfeature develop
 Switched to a new branch "myfeature"
 ```
@@ -44,7 +46,7 @@ Switched to a new branch "myfeature"
 
 Завершённая функциональность (фича) вливается обратно в ветвь разработки (develop) и попадает в следующий релиз.
 
-```bash
+```git
 $ git checkout develop
 Switched to branch 'develop'
 $ git merge --no-ff myfeature
@@ -71,7 +73,7 @@ $ git push origin develop
 
 Ветвь релиза создаётся из ветви разработки (develop).
 
-```bash
+```git
 $ git checkout -b release-1.2 develop
 Switched to a new branch "release-1.2"
 $ ./bump-version.sh 1.2
@@ -85,7 +87,7 @@ $ git commit -a -m "Bumped version number to 1.2"
 
 Когда мы решаем, что ветвь релиза (release branch) окончательно готова для выпуска, нужно проделать несколько действий. В первую очередь ветвь релиза вливается в главную ветвь (напоминаю, каждый коммит в master — это по определению новый релиз). Далее, этот коммит в master должен быть помечен тегом, чтобы в дальнейшем можно было легко обратиться к любой существовавшей версии продукта. И наконец, изменения, сделанные в ветви релиза (release branch), должны быть добавлены обратно в разработку (ветвь develop), чтобы будущие релизы также содержали внесённые исправления багов.
 
-```bash
+```git
 $ git checkout master
 Switched to branch 'master'
 $ git merge --no-ff release-1.2
@@ -98,7 +100,7 @@ $ git tag -a 1.2
 
 Чтобы сохранить изменения и в последующих релизах, мы должны влить эти изменения обратно в разработку. Делаем это так:
 
-```bash
+```git
 $ git checkout develop
 Switched to branch 'develop'
 $ git merge --no-ff release-1.2
@@ -109,7 +111,7 @@ Merge made by recursive.
 
 Теперь мы окончательно разделались с веткой релиза. Можно её удалять, потому что она нам больше не понадобится:
 
-```bash
+```git
 $ git branch -d release-1.2
 Deleted branch release-1.2 (was ff452fe).
 ```
@@ -129,7 +131,7 @@ Deleted branch release-1.2 (was ff452fe).
 
 Ветви исправлений (hotfix branches) создаются из главной (master) ветви.
 
-```bash
+```git
 $ git checkout -b hotfix-1.2.1 master
 Switched to a new branch "hotfix-1.2.1"
 $ ./bump-version.sh 1.2.1
@@ -143,7 +145,7 @@ $ git commit -a -m "Bumped version number to 1.2.1"
 
 Теперь можно исправлять баг, а изменения издавать хоть одним коммитом, хоть несколькими.
 
-```bash
+```git
 $ git commit -m "Fixed severe production problem"
 [hotfix-1.2.1 abbe5d6] Fixed severe production problem
 5 files changed, 32 insertions(+), 17 deletions(-)
@@ -155,7 +157,7 @@ $ git commit -m "Fixed severe production problem"
 
 Прежде всего надо обновить главную ветвь (master) и пометить новую версию тегом.
 
-```bash
+```git
 $ git checkout master
 Switched to branch 'master'
 $ git merge --no-ff hotfix-1.2.1
@@ -166,7 +168,7 @@ $ git tag -a 1.2.1
 
 Следующим шагом переносим исправление в ветвь разработки (develop).
 
-```bash
+```git
 $ git checkout develop
 Switched to branch 'develop'
 $ git merge --no-ff hotfix-1.2.1
@@ -178,7 +180,7 @@ Merge made by recursive.
 
 И наконец, удаляем временную ветвь:
 
-```bash
+```git
 $ git branch -d hotfix-1.2.1
 Deleted branch hotfix-1.2.1 (was abbe5d6).
 ```
@@ -190,6 +192,8 @@ Deleted branch hotfix-1.2.1 (was abbe5d6).
 
 Технически это реализуется несложно: Алиса создаёт удалённую ветку Git под названием bob, которая указывает на репозиторий Боба, а Боб делает то же самое с её репозиторием.
 
+
+
 ## Типовые ситуации (как их разрулить)
 
 
@@ -197,6 +201,92 @@ Deleted branch hotfix-1.2.1 (was abbe5d6).
 
 
 ## Шпаргалки по коммандам git
+
+Все комманды выполняются относительно указателя **HEAD** если в комманде явно не указано другое.
+
+клонировать репозиторий
+
+```git
+$ git clone <ссылка на удалённый репозиторий>
+```
+
+увидеть список подключенных удалённых репозиториев
+
+```git
+$ git remote -vv
+```
+
+добавить репозиторий
+
+```git
+$ git remote add [<локальное имя удалённого репозитория>] <ссылка на удалённый репозиторий>
+``` 
+
+увидеть все ветви
+```git
+$ git branch --all
+```
+
+увидеть все коммиты
+```git
+$ git log --graph --decorate
+```
+
+создать ветвь и перейти в неё
+```git
+$ git checkout -b <имя новой ветви> [<имя ветви от которой бренчимся>]
+```
+
+перейти в ветвь или в конкретный коммит
+```git
+$ git checkout <имя ветви> [| <первые 6-ть символов хеша коммита>]
+```
+
+увидеть состояние отслеживаемых файлов
+```git
+$ git status 
+```
+
+добавить файлы для слежения
+```git
+$ git add <имя файла/папки> ...
+```
+ 
+добавить коммит
+```git
+$ git commit [-a] -m "комментарий к коммиту"
+``` 
+ 
+добавить к последнему коммиту
+<br>*работает если не публиковались изменения (git push ...)*
+```git
+$ git commit --amend
+```
+
+отмена последнего коммита с сохранением изменений в файлах в рабочей папке
+<br>*работает если не публиковались изменения (git push ...)*
+```git
+$ git reset --soft HEAD^
+```
+
+удаление последнего коммита вместе с изменениями в файлах в рабочей папке
+<br>*работает если не публиковались изменения (git push ...)*
+```git
+$ git reset --hard HEAD^
+```
+ 
+слиться с данными из целевой ветки (параметр --no-ff обязателен!)
+```git
+$ git merge --no-ff <имя ветви из которой берём код>
+```
+
+удаление ветки
+```git
+$ git branch -d <имя ветки>
+```
+
+
+
 
 ### разрешение конфликтов слияния
 
